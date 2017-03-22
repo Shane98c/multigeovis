@@ -1,6 +1,12 @@
 // http://ionicframework.com/docs/v2/theming/
 
-
+.marker {
+    display: block;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
+}
 // App Global Sass
 // --------------------------------------------------
 // Put style rules here that you want to apply globally. These
