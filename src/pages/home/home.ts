@@ -1,14 +1,13 @@
 import { Component } from '@angular/core';
 import { NavController, LoadingController } from 'ionic-angular';
-// import * as mapboxgl from 'mapbox-gl/dist/mapbox-gl-dev';
-import { AboutPage } from '../about/about'
+// import { AboutPage } from '../about/about'
 import { FilterService } from '../../shared/filter.service'
 // import { LocService } from '../../shared/loc.service'
-// import { layers } from '../../shared/layers'
-// import { Map } from "leaflet";
+// import "leaflet";
+// declare var minichart: any;
+import "../../shared/leaflet.minichart.min.js";
 
-
-const accessToken = 'pk.eyJ1IjoiZmx5b3ZlcmNvdW50cnkiLCJhIjoiNDI2NzYzMmYxMzI5NWYxMDc0YTY5NzRiMzdlZDIyNTAifQ.x4T-qLEzRQMNFIdnkOkHKQ';
+declare var L: any;
 
 @Component({
   selector: 'page-home',
@@ -16,43 +15,53 @@ const accessToken = 'pk.eyJ1IjoiZmx5b3ZlcmNvdW50cnkiLCJhIjoiNDI2NzYzMmYxMzI5NWYx
   providers: [FilterService]
 })
 export class HomePage {
-  public map : any;
+  public map:any;
+  public timeSlice:any;
+  public charts:any = [];
   constructor(public filterService: FilterService, public navCtrl: NavController, public loadingCtrl: LoadingController) {
-    // (mapboxgl as any).accessToken = accessToken;
+
   }
   ngOnInit(): void {
     this.mapCtrl();
+    this.addGraph();
   }
 
   mapCtrl(): void {
-    // Map = new Map({
-    //   center: [-94.349742, 45.98909],
-    //   zoom: 5,
-    //   container: 'map',
-    //   style: 'mapbox://styles/mapbox/streets-v9'
-    // });
-    // this.map.on('load', () => {
-      console.log('map load');
-    // create a DOM element for the marker
-    // let el = document.createElement('div');
-    // el.className = 'marker';
-    // el.style.backgroundImage = 'url(https://placekitten.com/g/' + geojson.features[0].properties.iconSize.join('/') + '/)';
-    // el.style.width = geojson.features[0].properties.iconSize[0] + 'px';
-    // el.style.height = geojson.features[0].properties.iconSize[1] + 'px';
+    this.map = new L.Map('map', {
+      center: new L.LatLng(45.731253, -93.996139),
+      zoom: 7
+    });
+    L.tileLayer('http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg', {
+        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
+        maxZoom: 18,
+    }).addTo(this.map);
+  }
 
-        // add marker to map
-        // new mapboxgl.Marker(el)
-        //     .setLngLat(geojson.features[0].geometry.coordinates)
-        //     .addTo(this.map);
-    // })
+  addGraph(): void {
+    // let fakeData:any = [33,33,33];
+    // Create a barchart
+    // let charts = [];
+    for (var i = 0; i < 10; i++) {
+      var data = [33,33,33]
+      var loc = [(45.731253+i*Math.random()+1), (-93.996139+i*Math.random()+1)];
+      this.charts[i] = L.minichart(loc, {data: data, type:'polar-area'});
+      this.map.addLayer(this.charts[i]);
+    }
+
+    // this.myBarChart = L.minichart([45.731253, -93.996139], {data: fakeData, type:'polar-area'});
+    // this.map.addLayer(this.myBarChart);
+    // console.log('addGraph');
+  }
+  updateGraphs(): void {
+    console.log(this.timeSlice);
+    for (var i = 0; i < this.charts.length; i++) {
+      this.charts[i].setOptions({data:[Math.random()*this.timeSlice,this.timeSlice*Math.random(),this.timeSlice*Math.random()]})
+    }
+    // this.myBarChart.setOptions({data: [Math.random()*this.timeSlice,this.timeSlice*Math.random(),this.timeSlice*Math.random()]})
   }
   fabLocate(): void {
     console.log('fab press');
+    this.addGraph();
     this.filterService.formatData();
-    // document.getElementsByClassName('marker', (el) => {
-    //   let els = el;
-    //   els.style.width = '200 px';
-    //   els.style.height = '200 px';
-    // });
   }
 }

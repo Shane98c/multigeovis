@@ -1,9 +1,17 @@
+<div ion-fixed id='map' class='mapContainer'></div>
+
 <ion-content>
-  <div ion-fixed id='map' class='mapContainer'></div>
+
+  <div style="z-index:2000; background-color:white; position:absolute; bottom:0px; width: 100%;">
+    <ion-range (ionChange)="updateGraphs()" [(ngModel)]="timeSlice" min="1000" max="20000" step="1000" snaps="true" >
+      <ion-icon range-left small name="sunny"></ion-icon>
+      <ion-icon range-right name="sunny"></ion-icon>
+    </ion-range>
+  </div>
+
+  <ion-fab bottom right>
+      <button ion-fab (click)="fabLocate()" style="transform: translateY(-55px);">
+      	<ion-icon name="md-locate"></ion-icon>
+      </button>
+  </ion-fab>
 </ion-content>
-<ion-fab bottom right style="transform: translateY(-55px);">
-    <button ion-fab (click)="fabLocate()" >
-    	<ion-icon name="md-locate"></ion-icon>
-    </button>
-</ion-fab>
-<div class='marker'></div>
