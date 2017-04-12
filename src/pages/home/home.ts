@@ -18,14 +18,11 @@ export class HomePage {
   public map:any;
   public timeSlice:any;
   public charts:any = [];
-  constructor(public filterService: FilterService, public navCtrl: NavController, public loadingCtrl: LoadingController) {
-
-  }
+  constructor(public filterService: FilterService, public navCtrl: NavController, public loadingCtrl: LoadingController) {}
   ngOnInit(): void {
     this.mapCtrl();
     this.addGraph();
   }
-
   mapCtrl(): void {
     this.map = new L.Map('map', {
       center: new L.LatLng(45.731253, -93.996139),
@@ -36,28 +33,19 @@ export class HomePage {
         maxZoom: 18,
     }).addTo(this.map);
   }
-
   addGraph(): void {
-    // let fakeData:any = [33,33,33];
-    // Create a barchart
-    // let charts = [];
     for (var i = 0; i < 10; i++) {
       var data = [33,33,33]
       var loc = [(45.731253+i*Math.random()+1), (-93.996139+i*Math.random()+1)];
       this.charts[i] = L.minichart(loc, {data: data, type:'polar-area'});
       this.map.addLayer(this.charts[i]);
     }
-
-    // this.myBarChart = L.minichart([45.731253, -93.996139], {data: fakeData, type:'polar-area'});
-    // this.map.addLayer(this.myBarChart);
-    // console.log('addGraph');
   }
   updateGraphs(): void {
     console.log(this.timeSlice);
     for (var i = 0; i < this.charts.length; i++) {
       this.charts[i].setOptions({data:[Math.random()*this.timeSlice,this.timeSlice*Math.random(),this.timeSlice*Math.random()]})
     }
-    // this.myBarChart.setOptions({data: [Math.random()*this.timeSlice,this.timeSlice*Math.random(),this.timeSlice*Math.random()]})
   }
   fabLocate(): void {
     console.log('fab press');
