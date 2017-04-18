@@ -1,30 +1,38 @@
 import { Injectable } from '@angular/core';
-import { rawData } from './rawData';
+import { dataSet } from './dataSet';
 
 @Injectable()
 export class FilterService {
   constructor() { }
-  formatData() {
-    console.log(rawData);
+  formatData(rawData, stepNum) {
+    var data = rawData.data[0].Samples;
+    var ages: number[] = [];
+    for (var i:number = 0; i < data.length; i++) {
+      ages.push(data[i].SampleAges[1].AgeOlder);
+    };
+    let maxAge = Math.max.apply(Math, ages);
+    let minAge = Math.min.apply(Math, ages);
+    let step: number = maxAge/stepNum;
+    let ageBinData:any[] = [];
+    let binAge: number = undefined;
+    for (var i: number = 0; i < data.length; i++) {
+      for (var j: number = 0; j < stepNum; j++){
+        var curAge = data[i].SampleAges[1].AgeOlder;
+        if (curAge > step*j && curAge < step*(j+1)) {
+          binAge = step*(j+1);
+          ageBinData.push({
+            binAge: binAge,
+            SampleData: data[i].SampleData
+          });
+        }
+      }
+    }
+    for (var i:number = 0; i < ageBinData.length; i++){
+      ageBinData[i].SampleData.sort((a, b) => {
+        return  b.Value - a.Value;
+      });
+      ageBinData[i].SampleData = ageBinData[i].SampleData.slice(0, 4);
+    }
+    console.log(ageBinData);
   }
-
-
-  // formatGeo(geo) {
-  //   if(geo.geology) {
-  //     var geology = geo.geology;
-  //     geology.soilName = soils[geology.soils];
-  //     var layers = ["mesozoic_cretaceous","mesozoic_jurassic","paleozoic_cambrian","paleozoic_devonian","paleozoic_ordovician","precambrian_archean", "precambrian_proterozoic"];
-  //     var i = 0;
-  //     var layerArr = [];
-  //     for (i = 0; i < layers.length; i++) {
-  //       if (geology.hasOwnProperty(layers[i])){
-  //         var layerName = layers[i].replace("_", " ");
-  //         layerArr.push(geology[layers[i]] + ': (' +layerName+')');
-  //         geology.geolLayerContent = layerArr;
-  //       }
-  //     }
-  //   }
-  //   return geo;
-  // }
-
 }

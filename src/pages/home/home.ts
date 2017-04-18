@@ -5,6 +5,7 @@ import { FilterService } from '../../shared/filter.service'
 // import { LocService } from '../../shared/loc.service'
 // import "leaflet";
 // declare var minichart: any;
+import { rawData } from '../../shared/rawData';
 import "../../shared/leaflet.minichart.min.js";
 
 declare var L: any;
@@ -48,8 +49,6 @@ export class HomePage {
     }
   }
   fabLocate(): void {
-    console.log('fab press');
-    this.addGraph();
-    this.filterService.formatData();
+    this.filterService.formatData(rawData, 20);
   }
 }
