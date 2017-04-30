@@ -1,5 +1,6 @@
 export class dataSet {
   dataSetName: string
+  site: Object
   samples: [
     {
       sampleID: number,

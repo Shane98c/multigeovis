@@ -6,7 +6,7 @@ import { FilterService } from '../../shared/filter.service'
 // import "leaflet";
 // declare var minichart: any;
 import { rawData } from '../../shared/rawData';
-import "../../shared/leaflet.minichart.min.js";
+import "../../shared/leaflet.minichart.js";
 
 declare var L: any;
 
@@ -19,6 +19,7 @@ export class HomePage {
   public map:any;
   public timeSlice:any;
   public charts:any = [];
+  public circles:any = [];
   constructor(public filterService: FilterService, public navCtrl: NavController, public loadingCtrl: LoadingController) {}
   ngOnInit(): void {
     this.mapCtrl();
@@ -33,13 +34,27 @@ export class HomePage {
         attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
         maxZoom: 18,
     }).addTo(this.map);
+    // this.map.on('click', this.onMapClick);
   }
   addGraph(): void {
+    // var myCircle = new L.CircleMarker(new L.LatLng(50.924480, 10.758276), 10).addTo(this.map);
+    // myCircle.bindPopup("click").openPopup();
+    var options = {
+      data: [33,33,33],
+      type:'polar-area',
+      width:111,
+      labels: ["sdf","sldkfj", "slkfj"]
+    };
+    var chartTest = new L.minichart([45.731253,-93.996139], options).addTo(this.map);
+    chartTest.on("click",(e) => this.onMapClick(e));
     for (var i = 0; i < 10; i++) {
       var data = [33,33,33]
       var loc = [(45.731253+i*Math.random()+1), (-93.996139+i*Math.random()+1)];
-      this.charts[i] = L.minichart(loc, {data: data, type:'polar-area'});
+      this.charts[i] = new L.minichart(loc, {data: data, type:'polar-area'}).addTo(this.map);
+      this.circles[i] = new L.CircleMarker(loc, 30).addTo(this.map);
+      this.circles[i].on('click',(e) => this.onMapClick(e));
       this.map.addLayer(this.charts[i]);
+      // this.charts[i].on("click",(e) => this.onMapClick(e));
     }
   }
   updateGraphs(): void {
@@ -49,6 +64,10 @@ export class HomePage {
     }
   }
   fabLocate(): void {
-    this.filterService.formatData(rawData, 20);
+    var types = ['Pinus', 'Picea'];
+    this.filterService.formatData(rawData, 20, types);
+  }
+  onMapClick(e):void {
+    console.log(e);
   }
 }
