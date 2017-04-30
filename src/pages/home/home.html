@@ -3,7 +3,7 @@
 <ion-content>
 
   <div style="z-index:2000; background-color:white; position:absolute; bottom:0px; width: 100%;">
-    <ion-range (ionChange)="updateGraphs()" [(ngModel)]="timeSlice" min="1000" max="20000" step="1000" snaps="true" >
+    <ion-range (ionChange)="updateGraphs()" [(ngModel)]="timeSlice" min="0" max="19" step="1" snaps="true" >
       <ion-icon range-left small name="sunny"></ion-icon>
       <ion-icon range-right name="sunny"></ion-icon>
     </ion-range>

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, LoadingController } from 'ionic-angular';
+import { NavController, LoadingController, ModalController } from 'ionic-angular';
 // import { AboutPage } from '../about/about'
 import { FilterService } from '../../shared/filter.service'
 // import { LocService } from '../../shared/loc.service'
@@ -17,13 +17,14 @@ declare var L: any;
 })
 export class HomePage {
   public map:any;
-  public timeSlice:any;
+  public timeSlice:any = 0;
   public charts:any = [];
   public circles:any = [];
-  constructor(public filterService: FilterService, public navCtrl: NavController, public loadingCtrl: LoadingController) {}
+  public data:any = [];
+  constructor(public filterService: FilterService, public modalCtrl: ModalController, public navCtrl: NavController, public loadingCtrl: LoadingController) {}
   ngOnInit(): void {
     this.mapCtrl();
-    this.addGraph();
+    // this.addGraphs();
   }
   mapCtrl(): void {
     this.map = new L.Map('map', {
@@ -36,38 +37,55 @@ export class HomePage {
     }).addTo(this.map);
     // this.map.on('click', this.onMapClick);
   }
-  addGraph(): void {
-    // var myCircle = new L.CircleMarker(new L.LatLng(50.924480, 10.758276), 10).addTo(this.map);
-    // myCircle.bindPopup("click").openPopup();
-    var options = {
-      data: [33,33,33],
-      type:'polar-area',
-      width:111,
-      labels: ["sdf","sldkfj", "slkfj"]
-    };
-    var chartTest = new L.minichart([45.731253,-93.996139], options).addTo(this.map);
-    chartTest.on("click",(e) => this.onMapClick(e));
-    for (var i = 0; i < 10; i++) {
-      var data = [33,33,33]
-      var loc = [(45.731253+i*Math.random()+1), (-93.996139+i*Math.random()+1)];
+  addGraphs(procSamples): void {
+    for (let i = 0; i < procSamples.length; i++) {
+      let data = [];
+      for (let j = 0; j < procSamples[i].types.length; j++) {
+        data.push(procSamples[i].data[this.timeSlice].sampleData[j].value);
+      }
+
+      console.log(procSamples);
+      let loc = [procSamples[i].site.Latitude, procSamples[i].site.Longitude];
+      let circleOptions = {
+        radius: 30,
+        fillOpacity: 0,
+        opacity: 0
+      };
       this.charts[i] = new L.minichart(loc, {data: data, type:'polar-area'}).addTo(this.map);
-      this.circles[i] = new L.CircleMarker(loc, 30).addTo(this.map);
+      this.circles[i] = new L.CircleMarker(loc, circleOptions).addTo(this.map);
+      this.charts[i].ID = procSamples[i].ID;
+      this.circles[i].ID = procSamples[i].ID;
       this.circles[i].on('click',(e) => this.onMapClick(e));
-      this.map.addLayer(this.charts[i]);
-      // this.charts[i].on("click",(e) => this.onMapClick(e));
     }
   }
   updateGraphs(): void {
     console.log(this.timeSlice);
-    for (var i = 0; i < this.charts.length; i++) {
-      this.charts[i].setOptions({data:[Math.random()*this.timeSlice,this.timeSlice*Math.random(),this.timeSlice*Math.random()]})
+    for (let i = 0; i < this.charts.length; i++) {
+      let data = [];
+      for (let j = 0; j < this.data[i].types.length; j++) {
+        data.push(this.data[i].data[this.timeSlice].sampleData[j].value);
+      }
+      console.log(this.data);
+      console.log(data);
+      this.charts[i].setOptions({
+        data: data
+      })
     }
   }
   fabLocate(): void {
-    var types = ['Pinus', 'Picea'];
-    this.filterService.formatData(rawData, 20, types);
+    var types = ['Pinus', 'Picea', 'Ambrosia'];
+    this.data.push(this.filterService.formatData(rawData, 20, types));
+    this.addGraphs(this.data);
   }
   onMapClick(e):void {
     console.log(e);
   }
 }
+// var options = {
+//   data: [33,33,33],
+//   type:'polar-area',
+//   width:111,
+//   labels: ["sdf","sldkfj", "slkfj"]
+// };
+// var chartTest = new L.minichart([45.731253,-93.996139], options).addTo(this.map);
+// chartTest.on("click",(e) => this.onMapClick(e));
