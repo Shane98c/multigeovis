@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, LoadingController, ModalController } from 'ionic-angular';
-// import { AboutPage } from '../about/about'
+import { AboutPage } from '../about/about'
 import { FilterService } from '../../shared/filter.service'
 // import { LocService } from '../../shared/loc.service'
 // import "leaflet";
@@ -21,6 +21,7 @@ export class HomePage {
   public charts:any = [];
   public circles:any = [];
   public data:any = [];
+  public types:Array<string> = [];
   constructor(public filterService: FilterService, public modalCtrl: ModalController, public navCtrl: NavController, public loadingCtrl: LoadingController) {}
   ngOnInit(): void {
     this.mapCtrl();
@@ -51,7 +52,14 @@ export class HomePage {
         fillOpacity: 0,
         opacity: 0
       };
-      this.charts[i] = new L.minichart(loc, {data: data, type:'polar-area'}).addTo(this.map);
+      let chartOptions = {
+        data: data,
+        type:'polar-area',
+        labels: this.types,
+        labelMinSize: 1,
+        transitionTime: 250
+      };
+      this.charts[i] = new L.minichart(loc, chartOptions).addTo(this.map);
       this.circles[i] = new L.CircleMarker(loc, circleOptions).addTo(this.map);
       this.charts[i].ID = procSamples[i].ID;
       this.circles[i].ID = procSamples[i].ID;
@@ -73,12 +81,21 @@ export class HomePage {
     }
   }
   fabLocate(): void {
-    var types = ['Pinus', 'Picea', 'Ambrosia'];
-    this.data.push(this.filterService.formatData(rawData, 20, types));
+    this.types = ['Pinus', 'Picea', 'Ambrosia'];
+    this.data.push(this.filterService.formatData(rawData, 20, this.types));
     this.addGraphs(this.data);
   }
   onMapClick(e):void {
-    console.log(e);
+    let data = {};
+    for (let i = 0; i < this.data.length; i++) {
+      if (e.target.ID == this.data[i].ID) {
+        data = this.data[i]
+      }
+    }
+    console.log(data);
+    this.navCtrl.push(AboutPage, {
+      data: data
+    });
   }
 }
 // var options = {

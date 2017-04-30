@@ -1,55 +1,47 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { NavController, LoadingController } from 'ionic-angular';
 import { NavParams } from 'ionic-angular';
+import * as c3 from 'c3';
+import * as d3 from 'd3';
+
 // import { UnderService } from '../../shared/under.service'
-import { LocService } from '../../shared/loc.service'
+// import { LocService } from '../../shared/loc.service'
 
 @Component({
   selector: 'page-about',
   templateUrl: 'about.html',
-  providers: [LocService]
+  providers: []
 })
 export class AboutPage {
-  public under: any;
-  public curLoc: any;
-  constructor(private navCtrl: NavController, private navParams: NavParams, private loadingCtrl: LoadingController, public locService: LocService) {
+  public data: any;
+  constructor(private navCtrl: NavController, private navParams: NavParams, private loadingCtrl: LoadingController) {
   }
-  //
-  // ionViewWillEnter(){
-  //   if (this.navParams.data && this.navParams.data.under) {
-  //     this.under = this.navParams.get('under');
-  //   } else {
-  //     this.hereNow();
-  //   }
-  // }
-  // ionViewWillLeave(){
-  //   this.navParams.data = undefined;
-  //   this.under = undefined;
-  // }
-  // hereNow():void {
-  //   let loading = this.loadingCtrl.create();
-  //   loading.present();
-  //   this.locService.getCurrentPosition()
-  //     .subscribe(
-  //       res => {
-  //         let loc = {
-  //           lat: res.coords.latitude,
-  //           lng: res.coords.longitude
-  //         };
-  //         this.underService.getUnder(loc)
-  //         .then(UnderData => {
-  //           this.under = UnderData;
-  //           loading.dismiss();
-  //          })
-  //          .catch(ex => {
-  //            console.error('Error getting Geology', ex);
-  //            loading.dismiss();
-  //            alert('Error finding geological information');
-  //          });
-  //       },
-  //       err => {
-  //         alert('Geolocation unavailable.')
-  //       }
-  //   );
-  // }
+  @ViewChild('chart') chart: ElementRef;
+
+  ngOnInit(){
+    this.data = this.navParams.get('data');
+    // this.drawGraph();
+  }
+  ionViewDidEnter(): void {
+    let chart = this.chart.nativeElement;
+    console.log(this.data);
+    let columns = [];
+    for (let i = 0; i < this.data.types.length; i++) {
+      let data = [this.data.types[i]];
+      for (let j = 0; j < this.data.data.length; j++) {
+        data.push(this.data.data[j].sampleData[i].value);
+      }
+      columns.push(data);
+    }
+    c3.generate({
+      bindto: chart,
+      data: {
+          columns: columns,
+          type: 'area-spline'
+      },
+      axis: {
+        rotated: true
+      }
+    })
+  }
 }

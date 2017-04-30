@@ -22,6 +22,8 @@
     "@ionic/storage": "1.1.7",
     "@types/node": "^7.0.12",
     "@types/underscore": "^1.8.0",
+    "c3": "^0.4.11",
+    "d3": "^3.5.17",
     "ionic-angular": "^2.0.0",
     "ionic-native": "^2.2.11",
     "ionicons": "3.0.0",
@@ -35,6 +37,7 @@
   },
   "devDependencies": {
     "@ionic/app-scripts": "1.0.0",
+    "@types/c3": "0.4.41",
     "typescript": "2.1"
   },
   "cordovaPlugins": [

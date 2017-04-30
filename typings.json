@@ -2,5 +2,8 @@
   "globalDependencies": {
     "geojson": "registry:dt/geojson#0.0.0+20170113184913",
     "mapbox-gl": "registry:dt/mapbox-gl#0.29.0+20170103183059"
+  },
+  "dependencies": {
+    "d3": "registry:npm/d3#3.0.0+20160723033700"
   }
 }
