@@ -12,7 +12,9 @@ export class FilterService {
 
   formatData(rawData, stepNum, types, range) {
     //set initial data values
-    let data = rawData.data[0];
+    console.log(rawData);
+    let data = rawData;
+    console.log(data);
     this.processed = {};
     this.types = types;
     this.stepNum = stepNum;
@@ -49,7 +51,7 @@ export class FilterService {
         });
       }
       procSamples.push({
-        age: samples[j].SampleAges[1].AgeOlder,
+        age: samples[j].SampleAges[0].AgeOlder,
         sampleData: typedData
       })
     }

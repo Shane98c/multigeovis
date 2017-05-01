@@ -2,16 +2,19 @@ import { Component } from '@angular/core';
 import { NavController, LoadingController, ModalController } from 'ionic-angular';
 import { AboutPage } from '../about/about'
 import { FilterService } from '../../shared/filter.service'
+import { ReqData } from '../../shared/reqData.service'
+
 // import { LocService } from '../../shared/loc.service'
-import { rawData } from '../../shared/data/rawData';
+// import { rawData } from '../../shared/data/rawData';
 import "../../shared/leaflet.minichart.js";
+import * as search from '../../shared/Search_12'
 
 declare var L: any;
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html',
-  providers: [FilterService]
+  providers: [FilterService, ReqData]
 })
 export class HomePage {
   public map:any;
@@ -21,15 +24,31 @@ export class HomePage {
   public circles:any = [];
   public data:any = [];
   public types:Array<string> = [];
-  constructor(public filterService: FilterService, public navCtrl: NavController, public loadingCtrl: LoadingController) {}
+  constructor(public filterService: FilterService, public reqData: ReqData, public navCtrl: NavController, public loadingCtrl: LoadingController) {}
   ngOnInit(): void {
     this.mapCtrl();
+    this.getData();
+  }
+  getData() {
     this.types = ['Pinus', 'Picea', 'Ambrosia'];
     let range = [0, 20000];
-    this.data.push(this.filterService.formatData(rawData, 20, this.types, range));
-    this.addGraphs(this.data);
+    let rawData = this.reqData.requestData(search)
+    .then(response => {
+      let rawReturns = [];
+      for (let resp of response) {
+        let respjson = JSON.parse(resp._body)
+        if (respjson.data.length == 1) {
+          rawReturns.push(respjson.data[0]);
+        }
+      }
+      console.log(rawReturns)
+      for (let raw of rawReturns) {
+        console.log(raw)
+        this.data.push(this.filterService.formatData(raw, 20, this.types, range));
+      }
+      this.addGraphs(this.data);
+    });
   }
-
   mapCtrl(): void {
     this.map = new L.Map('map', {
       center: new L.LatLng(45.731253, -93.996139),
