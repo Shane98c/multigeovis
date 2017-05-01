@@ -3,12 +3,9 @@ import { NavController, LoadingController, ModalController } from 'ionic-angular
 import { AboutPage } from '../about/about'
 import { FilterService } from '../../shared/filter.service'
 import { ReqData } from '../../shared/reqData.service'
-
 // import { LocService } from '../../shared/loc.service'
-// import { rawData } from '../../shared/data/rawData';
 import "../../shared/leaflet.minichart.js";
-import * as search from '../../shared/Search_12'
-
+import * as search from '../../shared/Search_10'
 declare var L: any;
 
 @Component({
@@ -17,21 +14,30 @@ declare var L: any;
   providers: [FilterService, ReqData]
 })
 export class HomePage {
+  constructor(public filterService: FilterService, public reqData: ReqData, public navCtrl: NavController, public loadingCtrl: LoadingController) {}
+
   public map:any;
-  public timeSlice:any = 0;
+  //need to handle timeslice math here somehow using range and timestep
+  public timeSlice:number = 0;
+  public now:number = 0;
+  public timeStep:number = 10;
+  public range:Array<number> = [];
   public charts:any = [];
-  public chartType = 'polar-area'
+  public chartType:string = 'polar-area'
   public circles:any = [];
   public data:any = [];
   public types:Array<string> = [];
-  constructor(public filterService: FilterService, public reqData: ReqData, public navCtrl: NavController, public loadingCtrl: LoadingController) {}
+
   ngOnInit(): void {
     this.mapCtrl();
     this.getData();
   }
   getData() {
-    this.types = ['Pinus', 'Picea', 'Ambrosia'];
-    let range = [0, 20000];
+    let loading = this.loadingCtrl.create();
+    loading.present();
+    this.types = ['Pinus', 'Picea', 'Quercus', 'Ambrosia'];
+    this.range = [0, 5000];
+    // this.timeSlice = this.range[1]/this.timeStep
     let rawData = this.reqData.requestData(search)
     .then(response => {
       let rawReturns = [];
@@ -41,11 +47,10 @@ export class HomePage {
           rawReturns.push(respjson.data[0]);
         }
       }
-      console.log(rawReturns)
       for (let raw of rawReturns) {
-        console.log(raw)
-        this.data.push(this.filterService.formatData(raw, 20, this.types, range));
+        this.data.push(this.filterService.formatData(raw, this.timeStep, this.types, this.range));
       }
+      loading.dismiss();
       this.addGraphs(this.data);
     });
   }
@@ -55,7 +60,6 @@ export class HomePage {
       zoom: 7
     });
     L.tileLayer('http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg', {
-        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
         maxZoom: 18,
     }).addTo(this.map);
   }
@@ -86,11 +90,16 @@ export class HomePage {
     }
   }
   updateGraphs(): void {
+    this.now = (this.range[1]/20)*this.timeSlice;
     for (let i = 0; i < this.charts.length; i++) {
       let data = [];
       let opac = 1;
+      let missingData = 0
       for (let j = 0; j < this.data[i].types.length; j++) {
         if (this.data[i].data[this.timeSlice].sampleData[j].value == 1) {
+          missingData++;
+        }
+        if (missingData == this.data[i].types.length) {
           opac = 0;
         }
         data.push(this.data[i].data[this.timeSlice].sampleData[j].value);

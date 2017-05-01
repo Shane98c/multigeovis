@@ -12,9 +12,7 @@ export class FilterService {
 
   formatData(rawData, stepNum, types, range) {
     //set initial data values
-    console.log(rawData);
     let data = rawData;
-    console.log(data);
     this.processed = {};
     this.types = types;
     this.stepNum = stepNum;
@@ -51,7 +49,7 @@ export class FilterService {
         });
       }
       procSamples.push({
-        age: samples[j].SampleAges[0].AgeOlder,
+        age: samples[j].SampleAges[0].Age,
         sampleData: typedData
       })
     }
@@ -63,7 +61,7 @@ export class FilterService {
       ages.push(procSamples[i].age);
     };
     let maxAge = this.range[1];
-    let minAge = this.range[0];
+    // let minAge = this.range[0];
     // let maxAge = Math.max.apply(Math, ages);
     // let minAge = Math.min.apply(Math, ages);
     let step: number = maxAge/this.stepNum;

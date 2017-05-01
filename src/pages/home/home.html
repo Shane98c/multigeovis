@@ -1,9 +1,19 @@
-<div ion-fixed id='map' class='mapContainer'></div>
 
 <ion-content>
+  <div ion-fixed id='map' class='mapContainer'></div>
 
-  <div ion-fixed style="z-index:2000; background-color:white; position:absolute; bottom:0px; width: 100vw;">
-    <ion-range (ionChange)="updateGraphs()" [(ngModel)]="timeSlice" min="0" max="19" step="1" snaps="true" >
+  <div ion-fixed style="z-index:2000; background-color:none; position:absolute; bottom:0px; width: 100vw;">
+    <ion-card style="width:100px; margin:auto; margin-bottom:2px;" bottom>
+      <ion-card-content small style="margin:auto;text-align: center;">
+        <span>
+          {{now}}
+        </span>
+        <div style="font-size:small;">
+          years ago
+        </div>
+      </ion-card-content>
+    </ion-card>
+    <ion-range style="background-color:white;"(ionChange)="updateGraphs()" [(ngModel)]="timeSlice" min="0" max="9" step="1" snaps="false" >
       <ion-icon range-left small name="ios-clock-outline"></ion-icon>
       <ion-icon range-right name="ios-clock-outline"></ion-icon>
     </ion-range>
@@ -19,4 +29,5 @@
         <ion-icon name="ios-pie-outline"></ion-icon>
       </button>
   </ion-fab>
+
 </ion-content>
