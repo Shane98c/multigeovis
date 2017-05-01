@@ -41,10 +41,16 @@ export class AboutPage {
       },
       axis: {
         y: {
-          label: 'Abundance (binned counts)'
+          label: {
+            text: 'Abundance (binned counts)',
+            position: 'outer-middle'
+          }
         },
         x: {
-          label: 'Time (ka)'
+          label: {
+            text: 'Time (ka)',
+            position: 'outer-center'
+          }
         },
         rotated: true
       }
