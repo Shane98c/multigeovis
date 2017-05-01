@@ -1,14 +1,30 @@
 <ion-header>
   <ion-navbar>
     <ion-title class='aboutTitle'>
-      What's below?
-      <span *ngIf="under" class='latlng'>
-        Latitude: {{under.point['epsg:4326'][1].toFixed(3)}}
-        <br>Longitude {{under.point['epsg:4326'][0].toFixed(3)}}
+      {{data.site.SiteName}}
+      <span class='latlng'>
+        Latitude: {{data.site.Latitude.toFixed(3)}}
+        <br>Longitude {{data.site.Longitude.toFixed(3)}}
       </span>
     </ion-title>
   </ion-navbar>
 </ion-header>
 <ion-content>
   <div id="chart" #chart style="height:85vh;"></div>
+  <ion-card *ngIf="data.site.SiteDescription">
+    <ion-card-header>
+      Site Description
+    </ion-card-header>
+    <ion-card-content>
+      {{data.site.SiteDescription}}
+    </ion-card-content>
+  </ion-card>
+  <ion-card *ngIf="data.PI">
+      <ion-card-header>
+        Principle Investigator
+      </ion-card-header>
+      <ion-card-content *ngFor="let PI of data.PI">
+        {{PI.ContactName}}
+      </ion-card-content>
+    </ion-card>
 </ion-content>

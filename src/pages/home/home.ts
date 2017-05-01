@@ -3,9 +3,7 @@ import { NavController, LoadingController, ModalController } from 'ionic-angular
 import { AboutPage } from '../about/about'
 import { FilterService } from '../../shared/filter.service'
 // import { LocService } from '../../shared/loc.service'
-// import "leaflet";
-// declare var minichart: any;
-import { rawData } from '../../shared/rawData';
+import { rawData } from '../../shared/data/rawData';
 import "../../shared/leaflet.minichart.js";
 
 declare var L: any;
@@ -19,14 +17,19 @@ export class HomePage {
   public map:any;
   public timeSlice:any = 0;
   public charts:any = [];
+  public chartType = 'polar-area'
   public circles:any = [];
   public data:any = [];
   public types:Array<string> = [];
-  constructor(public filterService: FilterService, public modalCtrl: ModalController, public navCtrl: NavController, public loadingCtrl: LoadingController) {}
+  constructor(public filterService: FilterService, public navCtrl: NavController, public loadingCtrl: LoadingController) {}
   ngOnInit(): void {
     this.mapCtrl();
-    // this.addGraphs();
+    this.types = ['Pinus', 'Picea', 'Ambrosia'];
+    let range = [0, 20000];
+    this.data.push(this.filterService.formatData(rawData, 20, this.types, range));
+    this.addGraphs(this.data);
   }
+
   mapCtrl(): void {
     this.map = new L.Map('map', {
       center: new L.LatLng(45.731253, -93.996139),
@@ -36,7 +39,6 @@ export class HomePage {
         attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
         maxZoom: 18,
     }).addTo(this.map);
-    // this.map.on('click', this.onMapClick);
   }
   addGraphs(procSamples): void {
     for (let i = 0; i < procSamples.length; i++) {
@@ -44,8 +46,6 @@ export class HomePage {
       for (let j = 0; j < procSamples[i].types.length; j++) {
         data.push(procSamples[i].data[this.timeSlice].sampleData[j].value);
       }
-
-      console.log(procSamples);
       let loc = [procSamples[i].site.Latitude, procSamples[i].site.Longitude];
       let circleOptions = {
         radius: 30,
@@ -54,7 +54,7 @@ export class HomePage {
       };
       let chartOptions = {
         data: data,
-        type:'polar-area',
+        type: this.chartType,
         labels: this.types,
         labelMinSize: 1,
         transitionTime: 250
@@ -67,23 +67,32 @@ export class HomePage {
     }
   }
   updateGraphs(): void {
-    console.log(this.timeSlice);
     for (let i = 0; i < this.charts.length; i++) {
       let data = [];
+      let opac = 1;
       for (let j = 0; j < this.data[i].types.length; j++) {
+        if (this.data[i].data[this.timeSlice].sampleData[j].value == 1) {
+          opac = 0;
+        }
         data.push(this.data[i].data[this.timeSlice].sampleData[j].value);
       }
-      console.log(this.data);
-      console.log(data);
       this.charts[i].setOptions({
-        data: data
+        data: data,
+        type: this.chartType,
+        opacity: opac
       })
     }
   }
-  fabLocate(): void {
-    this.types = ['Pinus', 'Picea', 'Ambrosia'];
-    this.data.push(this.filterService.formatData(rawData, 20, this.types));
-    this.addGraphs(this.data);
+  toggleGraphType(): void {
+    if (this.chartType == 'bar') {
+      this.chartType = 'polar-area'
+    } else {
+      this.chartType = 'bar';
+    }
+    this.updateGraphs();
+  }
+  fabLocate():void {
+    console.log('find position');
   }
   onMapClick(e):void {
     let data = {};
@@ -92,17 +101,8 @@ export class HomePage {
         data = this.data[i]
       }
     }
-    console.log(data);
     this.navCtrl.push(AboutPage, {
       data: data
     });
   }
 }
-// var options = {
-//   data: [33,33,33],
-//   type:'polar-area',
-//   width:111,
-//   labels: ["sdf","sldkfj", "slkfj"]
-// };
-// var chartTest = new L.minichart([45.731253,-93.996139], options).addTo(this.map);
-// chartTest.on("click",(e) => this.onMapClick(e));

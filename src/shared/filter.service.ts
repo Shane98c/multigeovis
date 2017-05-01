@@ -6,15 +6,17 @@ export class FilterService {
 
   public types: Array<string>;
   public stepNum: number;
+  public range: Array<number>;
   public processed:any;
   public typedData:any;
 
-  formatData(rawData, stepNum, types) {
+  formatData(rawData, stepNum, types, range) {
     //set initial data values
     let data = rawData.data[0];
     this.processed = {};
     this.types = types;
     this.stepNum = stepNum;
+    this.range = range;
     this.processed.types = types;
     this.processed.site = data.Site;
     this.processed.ID = data.DatasetID;
@@ -58,8 +60,10 @@ export class FilterService {
     for (let i:number = 0; i < procSamples.length; i++) {
       ages.push(procSamples[i].age);
     };
-    let maxAge = Math.max.apply(Math, ages);
-    let minAge = Math.min.apply(Math, ages);
+    let maxAge = this.range[1];
+    let minAge = this.range[0];
+    // let maxAge = Math.max.apply(Math, ages);
+    // let minAge = Math.min.apply(Math, ages);
     let step: number = maxAge/this.stepNum;
     this.processed.stepSize = step;
     let ageBinData:any[] = [];
@@ -68,7 +72,8 @@ export class FilterService {
       let prevBin = k * step - step;
       let combinedVal = [];
       for (let j = 0; j < this.types.length; j++) {
-        combinedVal.push(0);
+        //this is one instead of zero to avoid bug in leaflet minichart when values are zero...
+        combinedVal.push(1);
       }
       for (let i = 0; i < procSamples.length; i++) {
         if (procSamples[i].age <= currentBin && procSamples[i].age >= prevBin) {
@@ -90,6 +95,5 @@ export class FilterService {
       });
     }
     this.processed.data = ageBinData;
-    console.log(this.processed)
   }
 }

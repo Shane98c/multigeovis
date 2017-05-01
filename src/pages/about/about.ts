@@ -40,6 +40,12 @@ export class AboutPage {
           type: 'area-spline'
       },
       axis: {
+        y: {
+          label: 'Abundance (binned counts)'
+        },
+        x: {
+          label: 'Time (ka)'
+        },
         rotated: true
       }
     })
