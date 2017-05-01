@@ -1,7 +1,13 @@
 
 <ion-content>
   <div ion-fixed id='map' class='mapContainer'></div>
-
+  <div ion-fixed style="z-index:2001; background-color:none; width: 100vw;">
+    <ion-card style="width:100px; margin:auto; margin-top:5px" top>
+      <ion-card-content small style="margin:auto;text-align: center;">
+        legend here
+      </ion-card-content>
+    </ion-card>
+  </div>
   <div ion-fixed style="z-index:2000; background-color:none; position:absolute; bottom:0px; width: 100vw;">
     <ion-card style="width:100px; margin:auto; margin-bottom:2px;" bottom>
       <ion-card-content small style="margin:auto;text-align: center;">
@@ -13,21 +19,20 @@
         </div>
       </ion-card-content>
     </ion-card>
-    <ion-range style="background-color:white;"(ionChange)="updateGraphs()" [(ngModel)]="timeSlice" min="0" max="9" step="1" snaps="false" >
+    <ion-range style="background-color:white;"(ionChange)="updateGraphs()" [(ngModel)]="timeSlice" min="0" max={{timeStep-1}} step="1" snaps="false" >
       <ion-icon range-left small name="ios-clock-outline"></ion-icon>
       <ion-icon range-right name="ios-clock-outline"></ion-icon>
     </ion-range>
+    <ion-fab bottom right>
+        <button ion-fab (click)="fabLocate()" style="transform: translateY(-55px);">
+          <ion-icon name="md-locate"></ion-icon>
+        </button>
+    </ion-fab>
+    <ion-fab bottom left>
+        <button ion-fab (click)="toggleGraphType()" style="transform: translateY(-55px);">
+          <ion-icon name="ios-pie-outline"></ion-icon>
+        </button>
+    </ion-fab>
   </div>
-
-  <ion-fab bottom right>
-      <button ion-fab (click)="fabLocate()" style="transform: translateY(-55px);">
-      	<ion-icon name="md-locate"></ion-icon>
-      </button>
-  </ion-fab>
-  <ion-fab bottom left>
-      <button ion-fab (click)="toggleGraphType()" style="transform: translateY(-55px);">
-        <ion-icon name="ios-pie-outline"></ion-icon>
-      </button>
-  </ion-fab>
 
 </ion-content>

@@ -4,9 +4,12 @@ import { AboutPage } from '../about/about'
 import { FilterService } from '../../shared/filter.service'
 import { ReqData } from '../../shared/reqData.service'
 // import { LocService } from '../../shared/loc.service'
+import "../../shared/leaflet.min.js";
 import "../../shared/leaflet.minichart.js";
-import * as search from '../../shared/Search_10'
 declare var L: any;
+
+import * as search from '../../shared/Search_10'
+
 
 @Component({
   selector: 'page-home',
@@ -23,7 +26,7 @@ export class HomePage {
   public timeStep:number = 10;
   public range:Array<number> = [];
   public charts:any = [];
-  public chartType:string = 'polar-area'
+  public chartType:string = 'polar-area';
   public circles:any = [];
   public data:any = [];
   public types:Array<string> = [];
@@ -35,7 +38,7 @@ export class HomePage {
   getData() {
     let loading = this.loadingCtrl.create();
     loading.present();
-    this.types = ['Pinus', 'Picea', 'Quercus', 'Ambrosia'];
+    this.types = ['Pinus', 'Picea', 'Quercus', 'Ambrosia', 'Alnus'];
     this.range = [0, 5000];
     // this.timeSlice = this.range[1]/this.timeStep
     let rawData = this.reqData.requestData(search)
@@ -88,9 +91,18 @@ export class HomePage {
       this.circles[i].ID = procSamples[i].ID;
       this.circles[i].on('click',(e) => this.onMapClick(e));
     }
+    this.map.on('locationfound', (e) => this.onLocationFound(e));
+    this.map.on('locationerror', (e) => this.onLocationError(e));
+  }
+  onLocationFound(e) {
+    let radius = e.accuracy / 2;
+    L.circle(e.latlng, radius).addTo(this.map);
+  }
+  onLocationError(e) {
+    alert(e.message);
   }
   updateGraphs(): void {
-    this.now = (this.range[1]/20)*this.timeSlice;
+    this.now = (this.range[1]/this.timeStep)*this.timeSlice;
     for (let i = 0; i < this.charts.length; i++) {
       let data = [];
       let opac = 1;
@@ -120,7 +132,7 @@ export class HomePage {
     this.updateGraphs();
   }
   fabLocate():void {
-    console.log('find position');
+    this.map.locate({setView: true, maxZoom: 8});
   }
   onMapClick(e):void {
     let data = {};
