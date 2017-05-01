@@ -2,9 +2,13 @@
 <ion-content>
   <div ion-fixed id='map' class='mapContainer'></div>
   <div ion-fixed style="z-index:2001; background-color:none; width: 100vw;">
-    <ion-card style="width:100px; margin:auto; margin-top:5px" top>
-      <ion-card-content small style="margin:auto;text-align: center;">
-        legend here
+    <ion-card style="width:80px; align:right; margin-top:5px; margin-left: 5px;">
+      <ion-card-content small style="margin:auto; text-align: center; padding: 0px;">
+        <div *ngFor="let leg of legend" style="font-size:small;">
+          <div [style.backgroundColor]="leg.color">
+            {{leg.type}}
+          </div>
+        </div>
       </ion-card-content>
     </ion-card>
   </div>

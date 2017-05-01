@@ -30,15 +30,28 @@ export class HomePage {
   public circles:any = [];
   public data:any = [];
   public types:Array<string> = [];
+  public colors:Array<string> = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99']
+  public legend:Array<Object> = [];
 
   ngOnInit(): void {
     this.mapCtrl();
     this.getData();
+    this.createLegend();
+  }
+  createLegend() {
+    let i = 0;
+    for (let type of this.types) {
+      this.legend.push({
+        type: type,
+        color: this.colors[i]
+      })
+      i++;
+    }
   }
   getData() {
     let loading = this.loadingCtrl.create();
     loading.present();
-    this.types = ['Pinus', 'Picea', 'Quercus', 'Ambrosia', 'Alnus'];
+    this.types = ['Pinus', 'Picea', 'Quercus', 'Ambrosia', 'Betula'];
     this.range = [0, 5000];
     // this.timeSlice = this.range[1]/this.timeStep
     let rawData = this.reqData.requestData(search)
@@ -83,7 +96,10 @@ export class HomePage {
         type: this.chartType,
         labels: this.types,
         labelMinSize: 1,
-        transitionTime: 250
+        transitionTime: 250,
+        width: 100,
+        opacity: 0.9,
+        colors: this.colors
       };
       this.charts[i] = new L.minichart(loc, chartOptions).addTo(this.map);
       this.circles[i] = new L.CircleMarker(loc, circleOptions).addTo(this.map);
@@ -105,7 +121,7 @@ export class HomePage {
     this.now = (this.range[1]/this.timeStep)*this.timeSlice;
     for (let i = 0; i < this.charts.length; i++) {
       let data = [];
-      let opac = 1;
+      let opac = 0.9;
       let missingData = 0
       for (let j = 0; j < this.data[i].types.length; j++) {
         if (this.data[i].data[this.timeSlice].sampleData[j].value == 1) {
