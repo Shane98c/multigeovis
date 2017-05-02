@@ -73,7 +73,8 @@ export class HomePage {
   mapCtrl(): void {
     this.map = new L.Map('map', {
       center: new L.LatLng(45.731253, -93.996139),
-      zoom: 7
+      zoom: 7,
+      zoomControl:false
     });
     L.tileLayer('http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg', {
         maxZoom: 18,
@@ -107,6 +108,7 @@ export class HomePage {
       this.circles[i].ID = procSamples[i].ID;
       this.circles[i].on('click',(e) => this.onMapClick(e));
     }
+    this.updateGraphs();
     this.map.on('locationfound', (e) => this.onLocationFound(e));
     this.map.on('locationerror', (e) => this.onLocationError(e));
   }
@@ -158,6 +160,7 @@ export class HomePage {
       }
     }
     this.navCtrl.push(AboutPage, {
+      colors: this.colors,
       data: data
     });
   }
