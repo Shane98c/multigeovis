@@ -16,7 +16,6 @@ export class ReqData {
   requestData(search): Promise <any> {
     let datasetIDs = this.parseSites(search);
     let promises = [];
-    let rawResponse = [];
     for (let datasetID of datasetIDs) {
       const url = ['http://api.neotomadb.org/v1/data/downloads/', datasetID].join('');
       let promise = this.http.get(url).toPromise();

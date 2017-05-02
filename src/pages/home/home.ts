@@ -5,7 +5,7 @@ import { FilterService } from '../../shared/filter.service'
 import { ReqData } from '../../shared/reqData.service'
 // import { LocService } from '../../shared/loc.service'
 import "../../shared/leaflet.min.js";
-import "../../shared/leaflet.minichart.js";
+import "../../shared/leaflet.minichart.min.js";
 declare var L: any;
 
 import * as search from '../../shared/Search_10'
@@ -32,6 +32,7 @@ export class HomePage {
   public types:Array<string> = [];
   public colors:Array<string> = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99']
   public legend:Array<Object> = [];
+  public commonNames: Array<string>;
 
   ngOnInit(): void {
     this.mapCtrl();
@@ -40,7 +41,7 @@ export class HomePage {
   }
   createLegend() {
     let i = 0;
-    for (let type of this.types) {
+    for (let type of this.commonNames) {
       this.legend.push({
         type: type,
         color: this.colors[i]
@@ -52,9 +53,10 @@ export class HomePage {
     let loading = this.loadingCtrl.create();
     loading.present();
     this.types = ['Pinus', 'Picea', 'Quercus', 'Ambrosia', 'Betula'];
+    this.commonNames = ['Pine', 'Spruce', 'Oak', 'Ragweed', 'Birch'];
     this.range = [0, 5000];
     // this.timeSlice = this.range[1]/this.timeStep
-    let rawData = this.reqData.requestData(search)
+    this.reqData.requestData(search)
     .then(response => {
       let rawReturns = [];
       for (let resp of response) {
