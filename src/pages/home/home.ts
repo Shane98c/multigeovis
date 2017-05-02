@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, LoadingController, ModalController } from 'ionic-angular';
+import { NavController, LoadingController } from 'ionic-angular';
 import { AboutPage } from '../about/about';
 import { FilterService } from '../../shared/filter.service';
 import { ReqData } from '../../shared/reqData.service';

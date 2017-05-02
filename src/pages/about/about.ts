@@ -64,7 +64,7 @@ export class AboutPage {
     })
   }
   buildLegend() {
-    let legend:any = ['x'];
+    let legend:any = ['x', 0];
     for (let data of this.data.data) {
       legend.push(data.binAge);
     }
