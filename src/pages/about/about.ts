@@ -13,7 +13,7 @@ import * as d3 from 'd3';
   providers: []
 })
 export class AboutPage {
-  public data: any;
+  public data:any;
   public colors:any;
   public legend:Array<number>;
   constructor(private navCtrl: NavController, private navParams: NavParams, private loadingCtrl: LoadingController) {

@@ -1,14 +1,17 @@
 import { Component } from '@angular/core';
 import { NavController, LoadingController, ModalController } from 'ionic-angular';
-import { AboutPage } from '../about/about'
-import { FilterService } from '../../shared/filter.service'
-import { ReqData } from '../../shared/reqData.service'
-// import { LocService } from '../../shared/loc.service'
+import { AboutPage } from '../about/about';
+import { FilterService } from '../../shared/filter.service';
+import { ReqData } from '../../shared/reqData.service';
+
+//import leaflet and minicharts (both share L.xxx)
+declare var L: any;
 import "../../shared/leaflet.min.js";
 import "../../shared/leaflet.minichart.min.js";
-declare var L: any;
 
-import * as search from '../../shared/Search_10'
+
+//Neotoma search list to be requested.
+import * as search from '../../shared/data/Search_10';
 
 
 @Component({
@@ -20,42 +23,41 @@ export class HomePage {
   constructor(public filterService: FilterService, public reqData: ReqData, public navCtrl: NavController, public loadingCtrl: LoadingController) {}
 
   public map:any;
-  //need to handle timeslice math here somehow using range and timestep
   public timeSlice:number = 0;
   public now:number = 0;
-  public timeStep:number = 10;
-  public range:Array<number> = [];
   public charts:any = [];
-  public chartType:string = 'polar-area';
   public circles:any = [];
-  public data:any = [];
-  public types:Array<string> = [];
-  public colors:Array<string> = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99']
   public legend:Array<Object> = [];
-  public commonNames: Array<string>;
+  public data:any = [];
+
+  //config
+  public colors:Array<string> = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99'];
+  public types:Array<string> = ['Pinus', 'Picea', 'Quercus', 'Ambrosia', 'Betula'];
+  public commonNames: Array<string> = ['Pine', 'Spruce', 'Oak', 'Ragweed', 'Birch'];
+  public range:Array<number> = [0, 5000];
+  public timeStep:number = 10;
+  public chartType:string = 'polar-area';
 
   ngOnInit(): void {
     this.mapCtrl();
     this.getData();
     this.createLegend();
   }
-  createLegend() {
-    let i = 0;
-    for (let type of this.commonNames) {
-      this.legend.push({
-        type: type,
-        color: this.colors[i]
-      })
-      i++;
-    }
+  mapCtrl(): void {
+    this.map = new L.Map('map', {
+      center: new L.LatLng(45.731253, -93.996139),
+      zoom: 7,
+      zoomControl:false
+    });
+    L.tileLayer('http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg', {
+        maxZoom: 18,
+    }).addTo(this.map);
+    this.map.on('locationfound', (e) => this.onLocationFound(e));
+    this.map.on('locationerror', (e) => this.onLocationError(e));
   }
   getData() {
     let loading = this.loadingCtrl.create();
     loading.present();
-    this.types = ['Pinus', 'Picea', 'Quercus', 'Ambrosia', 'Betula'];
-    this.commonNames = ['Pine', 'Spruce', 'Oak', 'Ragweed', 'Birch'];
-    this.range = [0, 5000];
-    // this.timeSlice = this.range[1]/this.timeStep
     this.reqData.requestData(search)
     .then(response => {
       let rawReturns = [];
@@ -68,19 +70,19 @@ export class HomePage {
       for (let raw of rawReturns) {
         this.data.push(this.filterService.formatData(raw, this.timeStep, this.types, this.range));
       }
-      loading.dismiss();
       this.addGraphs(this.data);
+      loading.dismiss();
     });
   }
-  mapCtrl(): void {
-    this.map = new L.Map('map', {
-      center: new L.LatLng(45.731253, -93.996139),
-      zoom: 7,
-      zoomControl:false
-    });
-    L.tileLayer('http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg', {
-        maxZoom: 18,
-    }).addTo(this.map);
+  createLegend() {
+    let i = 0;
+    for (let type of this.commonNames) {
+      this.legend.push({
+        type: type,
+        color: this.colors[i]
+      })
+      i++;
+    }
   }
   addGraphs(procSamples): void {
     for (let i = 0; i < procSamples.length; i++) {
@@ -89,6 +91,7 @@ export class HomePage {
         data.push(procSamples[i].data[this.timeSlice].sampleData[j].value);
       }
       let loc = [procSamples[i].site.Latitude, procSamples[i].site.Longitude];
+      //adding transparent circles as workaround for minchart bug w/click handling.
       let circleOptions = {
         radius: 30,
         fillOpacity: 0,
@@ -97,7 +100,7 @@ export class HomePage {
       let chartOptions = {
         data: data,
         type: this.chartType,
-        labels: this.types,
+        labels: this.commonNames,
         labelMinSize: 1,
         transitionTime: 250,
         width: 100,
@@ -108,11 +111,9 @@ export class HomePage {
       this.circles[i] = new L.CircleMarker(loc, circleOptions).addTo(this.map);
       this.charts[i].ID = procSamples[i].ID;
       this.circles[i].ID = procSamples[i].ID;
-      this.circles[i].on('click',(e) => this.onMapClick(e));
+      this.circles[i].on('click',(e) => this.onGraphClick(e));
     }
     this.updateGraphs();
-    this.map.on('locationfound', (e) => this.onLocationFound(e));
-    this.map.on('locationerror', (e) => this.onLocationError(e));
   }
   onLocationFound(e) {
     let radius = e.accuracy / 2;
@@ -121,7 +122,11 @@ export class HomePage {
   onLocationError(e) {
     alert(e.message);
   }
+  fabLocate():void {
+    this.map.locate({setView: true, maxZoom: 8});
+  }
   updateGraphs(): void {
+    //get current time for display
     this.now = (this.range[1]/this.timeStep)*this.timeSlice;
     for (let i = 0; i < this.charts.length; i++) {
       let data = [];
@@ -131,6 +136,7 @@ export class HomePage {
         if (this.data[i].data[this.timeSlice].sampleData[j].value == 1) {
           missingData++;
         }
+        //check if data is missing (1), and set to transparent if it is.
         if (missingData == this.data[i].types.length) {
           opac = 0;
         }
@@ -151,10 +157,7 @@ export class HomePage {
     }
     this.updateGraphs();
   }
-  fabLocate():void {
-    this.map.locate({setView: true, maxZoom: 8});
-  }
-  onMapClick(e):void {
+  onGraphClick(e):void {
     let data = {};
     for (let i = 0; i < this.data.length; i++) {
       if (e.target.ID == this.data[i].ID) {

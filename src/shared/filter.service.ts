@@ -61,9 +61,6 @@ export class FilterService {
       ages.push(procSamples[i].age);
     };
     let maxAge = this.range[1];
-    // let minAge = this.range[0];
-    // let maxAge = Math.max.apply(Math, ages);
-    // let minAge = Math.min.apply(Math, ages);
     let step: number = maxAge/this.stepNum;
     this.processed.stepSize = step;
     let ageBinData:any[] = [];
