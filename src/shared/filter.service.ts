@@ -70,7 +70,7 @@ export class FilterService {
       let combinedVal = [];
       for (let j = 0; j < this.types.length; j++) {
         //this is one instead of zero to avoid bug in leaflet minichart when values are zero...
-        combinedVal.push(1);
+        combinedVal.push(0);
       }
       for (let i = 0; i < procSamples.length; i++) {
         if (procSamples[i].age <= currentBin && procSamples[i].age >= prevBin) {

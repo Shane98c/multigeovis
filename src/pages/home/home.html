@@ -22,7 +22,7 @@
         </div>
       </ion-card-content>
     </ion-card>
-    <ion-range style="background-color:white;"(ionChange)="updateGraphs()" [(ngModel)]="timeSlice" min="0" max={{timeStep-1}} step="1" snaps="false" >
+    <ion-range style="background-color:white;"(ionChange)="updateGraphs()" [(ngModel)]="timeSlice" min="0" max={{timeStep-1}} step="1" snaps="true" >
       <ion-icon range-left small name="ios-clock-outline"></ion-icon>
       <ion-icon range-right name="ios-clock-outline"></ion-icon>
     </ion-range>

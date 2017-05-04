@@ -23,10 +23,11 @@ export class HomePage {
   constructor(public filterService: FilterService, public reqData: ReqData, public navCtrl: NavController, public loadingCtrl: LoadingController) {}
 
   public map:any;
+  //timeSlice is updated based on slider location
   public timeSlice:number = 0;
+  //now is the current time period based on timeSlice and range.
   public now:number = 0;
   public charts:any = [];
-  public circles:any = [];
   public legend:Array<Object> = [];
   public data:any = [];
 
@@ -34,7 +35,7 @@ export class HomePage {
   public colors:Array<string> = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99'];
   public types:Array<string> = ['Pinus', 'Picea', 'Quercus', 'Ambrosia', 'Betula'];
   public commonNames: Array<string> = ['Pine', 'Spruce', 'Oak', 'Ragweed', 'Birch'];
-  public range:Array<number> = [0, 5000];
+  public range:Array<number> = [0, 18000];
   public timeStep:number = 10;
   public chartType:string = 'polar-area';
 
@@ -50,12 +51,12 @@ export class HomePage {
       zoomControl:false
     });
     L.tileLayer('http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg', {
-        maxZoom: 18,
+      maxZoom: 18,
     }).addTo(this.map);
     this.map.on('locationfound', (e) => this.onLocationFound(e));
     this.map.on('locationerror', (e) => this.onLocationError(e));
   }
-  getData() {
+  getData(): void {
     let loading = this.loadingCtrl.create();
     loading.present();
     this.reqData.requestData(search)
@@ -74,7 +75,7 @@ export class HomePage {
       loading.dismiss();
     });
   }
-  createLegend() {
+  createLegend(): void {
     let i = 0;
     for (let type of this.commonNames) {
       this.legend.push({
@@ -91,12 +92,6 @@ export class HomePage {
         data.push(procSamples[i].data[this.timeSlice].sampleData[j].value);
       }
       let loc = [procSamples[i].site.Latitude, procSamples[i].site.Longitude];
-      //adding transparent circles as workaround for minchart bug w/click handling.
-      let circleOptions = {
-        radius: 30,
-        fillOpacity: 0,
-        opacity: 0
-      };
       let chartOptions = {
         data: data,
         type: this.chartType,
@@ -105,21 +100,20 @@ export class HomePage {
         transitionTime: 250,
         width: 100,
         opacity: 0.9,
+        // maxValue: 10000000,
         colors: this.colors
       };
       this.charts[i] = new L.minichart(loc, chartOptions).addTo(this.map);
-      this.circles[i] = new L.CircleMarker(loc, circleOptions).addTo(this.map);
+      this.charts[i].on('click',(e) => this.onGraphClick(e));
       this.charts[i].ID = procSamples[i].ID;
-      this.circles[i].ID = procSamples[i].ID;
-      this.circles[i].on('click',(e) => this.onGraphClick(e));
     }
     this.updateGraphs();
   }
-  onLocationFound(e) {
+  onLocationFound(e): void {
     let radius = e.accuracy / 2;
     L.circle(e.latlng, radius).addTo(this.map);
   }
-  onLocationError(e) {
+  onLocationError(e): void {
     alert(e.message);
   }
   fabLocate():void {
