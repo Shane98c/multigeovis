@@ -34,8 +34,8 @@ export class HomePage {
   public colors:Array<string> = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99'];
   public types:Array<string> = ['Pinus', 'Picea', 'Quercus', 'Ambrosia', 'Betula'];
   public commonNames: Array<string> = ['Pine', 'Spruce', 'Oak', 'Ragweed', 'Birch'];
-  public range:Array<number> = [0, 5000];
-  public timeStep:number = 10;
+  public range:Array<number> = [0, 18000];
+  public timeStep:number = 20;
   public chartType:string = 'polar-area';
 
   ngOnInit(): void {
@@ -131,7 +131,7 @@ export class HomePage {
     for (let i = 0; i < this.charts.length; i++) {
       let data = [];
       let opac = 0.9;
-      let missingData = 0
+      let missingData = 0;
       for (let j = 0; j < this.data[i].types.length; j++) {
         if (this.data[i].data[this.timeSlice].sampleData[j].value == 1) {
           missingData++;
